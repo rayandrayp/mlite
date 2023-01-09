@@ -1,0 +1,116 @@
+Khanza Lite Change log
+
+01/18/2022
+- admin.php (plugins/dashboard/Admin.php)
+    line 48-51
+        Mengganti parameter pegawai ID dengan pegawai NIK untuk mendapatkan waktu shift
+    
+    line 147 & line 148
+        Mengganti parameter pegawai ID menjadi pegawai NIK
+
+    line 184
+        Menghapus parameter $jadwaltambahan karena masih belum dibutuhkan (tabel masih kosong)
+
+01/19/2022
+- main.html (plugins/dashboard/view/admin/main.html)
+    line 144 && line 152-153
+        Menambahkan informasi waktu check in & check out
+
+    line 209-219 && line 229-238
+        Menonaktifkan fungsi webcam
+    
+    line 241-245
+        Menambahkan fungsi httprequest
+
+    line 179-185
+        Menambahkan fungsi If untuk hanya menampilkan shift yang aktif (dipilih saat presensi awal) di presensi keluar
+
+- admin.php (plugins/dashboard/Admin.php)
+    function postUpload
+        Menonaktifkan fungsi upload img
+        Melakukan Bypass untuk menyimpan data
+
+- site.php (plugins/anjungan/Site.php)
+    function getDisplayAPM
+        Menambahkan where clause pada variable $penjab
+
+01/20/2022
+- main.html (plugins/dashboard/view/admin/main.html)
+    Menambahkan label dan textarea untuk alasan keterlambatan/pulang sebelum waktunya
+    Menambahkan fungsi JS untuk show/hide form alasan
+
+- admin.php (plugins/dashboard/Admin.php)
+    Menambahkan code untuk menyimpan alasan ke dalam DB
+    PS: untuk sementara, saya menggunakan kolom Photo di tabel temporary_presensi untuk menyimpan alasan. Mohon dipikirkan kembali jika webcam diaktifkan. Ehe..
+
+01/24/2022
+- DB table mlite_settings
+    Update data (
+        module => anjungan
+        field => display_poli
+        value => AKP,ANA,AND,ANT,APT,BDA,BDM,BDP,BED,BSY,BTK,GER,GIG,GIZ,GND,GOR,GPR,GRD,HDL,INT,IRM,JAN,JIW,KDK,KDN,KDO,KDP,KEMO,KLT,KON,KOR,MAT,OBG,ORT,PAR,PNM,SAR,THT,UGD,VCT
+    )
+    Untuk memunculkan poli pada menu Anjungan->Antrian Poliklinik
+
+01/25/2022
+- site.php (plugins/anjungan/Site.php)
+    Menambahkan pengecekan nomor antrian pada Function getAjax() 
+    Mengganti format query menjadi prepare query (menulis query secara manual) untuk mengambil kode dan nama poli dengan cara DISTINCT pada Function getAjax(), case get-poli
+    Nilai $_POST['kd_pj'] diambil dari display.antrian.html, sebelumnya dari fungsi '$this->settings->get('anjungan.carabayar_umum')' 
+
+- display.antrian.html (plugins/dashboard/view/display.antrian.html)
+    Menambahkan kd_pj di #finish
+
+01/28/2022
+- site.php (plugins/anjungan/Site.php)
+    Fungsi 'case : panggil_loket
+    Banyak lah, pokoknya terkait antrean online
+    
+- display.antrian.html (plugins/dashboard/view/display.antrian.html)
+    Ganti fungsi JS ke setInterval 1000 untuk refresh loket antrian
+    Ubah layout display loket antrian
+    Banyak lah, pokoknya terkait antrean online
+
+02/17/2022
+- site.php (plugins/anjungan/Site.php)
+    Tambah fungsi untuk display antrian farmasi
+    Tambah fungsi untuk menampilkan kode booking
+    Tambah fungsi untuk batal antrian
+    Tambah fungsi untuk selesai
+
+- display.antrian.farmasi.html
+    tambah halaman
+    Ubah tampilan operasi loket
+
+-display.antrian.farmasi.console.html
+    tambah halaman
+
+03/21/2022
+- site.php (plugins/anjungan/Site.php)
+    Tambah fungsi untuk prepare data WS
+    Tambah fungsi send data WS
+    Ganti fungsi untuk menampilkan dokter menjadi berasal dari WS BPJS referensi jadwal dokter
+    Tambah kode untuk menyimpan data pendaftaran dan mengirim data ke WS BPJS dan WS RS (post-registrasi)
+    Tambah kode untuk mengirim data Update Waktu Antrean menjadi 3 (post-registrasi)
+
+- display.antrian.html
+    Tambah kode untuk daftar berdasarkan NIK (umum) dan no Peserta (BPJS)
+    Tambah fungsi untuk mengambil dan menampilkan data rujukan dari WS BPJS
+    Tambah fungsi untuk mengambil dan menampilkan jadwal dokter
+
+03/31/2022
+- Admin.php (plugins/rawat_jalan/Admin.php)
+    Tambah fungsi prepare Data WS
+    Tambah fungsi send Data WS
+    Tambah kode di postStatusRawat() untuk update waktu berdasarkan pilihan Status Rawat
+
+- site.php (plugins/anjungan/Site.php)
+    Tambah kode untuk update waktu dan batal di farmasi (getDisplayAntrianFarmasi)
+    Tambah kode saat Checkin untuk kirim data ke WS BPJS (Tambah Antrean)
+    Ubah kode untuk menampilkan poli meskipun pasien Umum sudah daftar di poli lain (get-poli) 
+
+- DB
+    Tambah table record_antrian_mobilejkn
+
+07/12/2022
+- Menambahkan dan menyesuaikan isi dashboard manajemen

@@ -1,0 +1,201 @@
+<ul class="nav nav-tabs">
+    <li><a href="{?=url([ADMIN,'manajemen','dashboard'])?}">Dashboard</a></li>
+    <!-- <li><a href="{?=url([ADMIN,'manajemen','pendaftaran'])?}">Pendaftaran</a></li> -->
+    <li><a href="{?=url([ADMIN,'manajemen','rawatjalan'])?}">Rawat Jalan</a></li>
+    <li><a href="{?=url([ADMIN,'manajemen','rawatinap'])?}">Rawat Inap</a></li>
+    <li><a href="{?=url([ADMIN,'manajemen','dokter'])?}">Dokter</a></li>
+    <!-- <li><a href="{?=url([ADMIN,'manajemen','laboratorium'])?}">Laboratorium</a></li> -->
+    <!-- <li><a href="{?=url([ADMIN,'manajemen','radiologi'])?}">Radiologi</a></li> -->
+    <li><a href="{?=url([ADMIN,'manajemen','apotek'])?}">Apotek</a></li>
+    <!-- <li><a href="{?=url([ADMIN,'manajemen','farmasi'])?}">Farmasi</a></li> -->
+    <li class="active"><a href="{?=url([ADMIN,'manajemen','kasir'])?}">Kasir</a></li>
+    <!-- <li><a href="{?=url([ADMIN,'manajemen','presensi'])?}">Presensi</a></li> -->
+    <li><a href="{?=url([ADMIN,'manajemen','mutu'])?}">Indikator Mutu</a></li>
+</ul>
+<br>
+<div class="row">
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="panel panel-default">
+              <div class="panel-body bg-danger">
+                    <span class="fa-2x fa-stack fa-lg pull-left">
+                        <i class="fa fa-calendar-plus-o fa-stack-1x"></i>
+                    </span>
+                    <div class="stat-title text-grey">Total Pendapatan Bulan {?=date('F')?}</div>
+                    <div class="stat-bold">
+                        {?= $stats.getTotalRevenueMonth ?}
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentRevenueMonth >= 0}up{else}down{/if}"></i>
+                            ({?= $stats.percentRevenueMonth ?}%)
+                        </span>
+                    </div>
+              </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="panel panel-default">
+              <div class="panel-body bg-info">
+                    <span class="fa-2x fa-stack fa-lg pull-left">
+                        <i class="fa fa-calendar fa-stack-1x"></i>
+                    </span>
+                    <div class="stat-title text-grey">Pendapatan Rajal Bulan {?=date('F')?}</div>
+                    <div class="stat-bold">
+                        Cash : {?= $stats.getRevenueRJMonth ?}
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRJMonth >= 0}up{else}down{/if}"></i>
+                            ({?= $stats.percentRevenueRJMonth ?}%)
+                        </span>
+                        Piutang : 0
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRJMonth >= 0}up{else}down{/if}"></i>
+                            <!-- ({?= $stats.percentRevenueRJMonth ?}%) -->
+                        </span>
+                    </div>
+              </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="panel panel-default">
+              <div class="panel-body bg-warning">
+                    <span class="fa-2x fa-stack fa-lg pull-left">
+                        <i class="fa fa-users fa-stack-1x"></i>
+                    </span>
+                    <div class="stat-title text-grey">Pendapatan Ranap Bulan {?=date('F')?}</div>
+                    <div class="stat-bold">
+                        Cash : {?= $stats.getRevenueRIMonth ?}
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRIMonth >= 0}up{else}down{/if}"></i>
+                            ({?= $stats.percentRevenueRIMonth ?}%)
+                        </span>
+                        Piutang : 0
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRIMonth >= 0}up{else}down{/if}"></i>
+                            <!-- ({?= $stats.percentRevenueRIMonth ?}%) -->
+                        </span>
+                    </div>
+              </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 col-xs-12">
+        <div class="panel panel-default">
+              <div class="panel-body bg-success">
+                    <span class="fa-2x fa-stack fa-lg pull-left">
+                        <i class="fa fa-wheelchair fa-stack-1x"></i>
+                    </span>
+                    <div class="stat-title text-grey">Pendapatan Lain Lain Hari Ini</div>
+                    <div class="stat-bold">
+                        {?= $stats.getRevenueOthers?}
+                        <span class="stat-up-down">
+                            <i class="fa fa-arrow-circle-{if: $stats.percentDays >= 0}up{else}down{/if}"></i>
+                            ({?= $stats.percentRevenueOthers ?}%)
+                        </span>
+                    </div>
+              </div>
+        </div>
+    </div>
+</div> 
+
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cara Bayar Tahun {?=date('Y')?}</h3>
+            </div>
+            <div class="panel-body">
+                <canvas id="total-revenue-chart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cara Bayar Bulan {?=date('F')?}</h3>
+            </div>
+            <div class="panel-body">
+                <canvas id="total-revenue-month-chart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Cara Bayar Hari Ini</h3>
+            </div>
+            <div class="panel-body">
+                <canvas id="total-revenue-day-chart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        //Total Revenue Doughnut chart
+        var ctx2 = document.getElementById("total-revenue-chart");
+        var myChart2 = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: [
+                    "Tunai",
+                    "BPJS",
+                    "Lain-Lain"
+                ],
+                datasets: [{
+                    backgroundColor: ["#4caf50", "#34316E", "#F58634"],
+                    pointRadius: 0,
+                    data:  ["{?= implode('","', $stats.getCaraBayar.year) ?}"],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+
+    $(function () {
+        var ctx2 = document.getElementById("total-revenue-month-chart");
+        var myChart2 = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: [
+                    "Tunai",
+                    "BPJS",
+                    "Lain-Lain"
+                ],
+                datasets: [{
+                    backgroundColor: ["#4caf50", "#34316E", "#F58634"],
+                    pointRadius: 0,
+                    data:  ["{?= implode('","', $stats.getCaraBayar.month) ?}"],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+
+    $(function () {
+        var ctx2 = document.getElementById("total-revenue-day-chart");
+        var myChart2 = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: [
+                    "Tunai",
+                    "BPJS",
+                    "Lain-Lain"
+                ],
+                datasets: [{
+                    backgroundColor: ["#4caf50", "#34316E", "#F58634"],
+                    pointRadius: 0,
+                    data:  ["{?= implode('","', $stats.getCaraBayar.day) ?}"],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    });
+</script> 
