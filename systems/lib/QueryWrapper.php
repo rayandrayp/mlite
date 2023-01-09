@@ -474,7 +474,7 @@ class QueryWrapper
                 $columns = implode(',', array_keys($this->sets));
                 $this->set_binds = array_values($this->sets);
                 $qs = implode(',', array_fill(0, count($this->sets), '?'));
-                // $sql = "INSERT INTO $this->table($columns) VALUES($qs)";
+                $sql = "INSERT INTO $this->table($columns) VALUES($qs)";
                 $this->condition_binds = array();
 
                 return $sql;
