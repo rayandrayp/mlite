@@ -1236,8 +1236,11 @@ class Admin extends AdminModule
       $imgName = time() . $cntr++;
       $imgPath = $dir . '/' . $id . '_' . $imgName . '.' . $img->getInfos('type');
       $lokasi_file = 'pages/upload/' . $id . '_' . $imgName . '.' . $img->getInfos('type');
-      $img->save($imgPath);
-      $query = $this->core->mysql('berkas_digital_perawatan')->save(['no_rawat' => $_POST['no_rawat'], 'kode' => $_POST['kode'], 'lokasi_file' => $lokasi_file]);
+      if(move_uploaded_file($image, $imgPath)){
+        $query = $this->core->mysql('berkas_digital_perawatan')->save(['no_rawat' => $_POST['no_rawat'], 'kode' => $_POST['kode'], 'lokasi_file' => $lokasi_file]);
+      } else {
+        $query = false;
+      }
       if ($query) {
         echo '<br><img src="' . WEBAPPS_URL . '/berkasrawat/' . $lokasi_file . '" width="150" />';
       }

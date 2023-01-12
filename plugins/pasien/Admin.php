@@ -1036,7 +1036,7 @@ class Admin extends AdminModule
             ->where('tgl_perawatan', $detail_pemberian_obat['tgl_perawatan'])
             ->where('jam', $detail_pemberian_obat['jam'])
             ->oneArray();
-          $detail_pemberian_obat['aturan'] = $aturan_pakai['aturan'];
+          $detail_pemberian_obat['aturan'] = ($aturan_pakai) ? $aturan_pakai['aturan_pakai'] : '';
           $row['detail_pemberian_obat'][] = $detail_pemberian_obat;
         }
 
