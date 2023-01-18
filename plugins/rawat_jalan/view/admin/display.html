@@ -35,6 +35,7 @@
               <li><a href="{?=url([ADMIN, 'pasien', 'riwayatperawatan', $value.no_rkm_medis])?}" data-toggle="modal" data-target="#riwayatModal">Riwayat Perawatan</a></li>
               {if: $this->core->getUserInfo('role') == 'admin' || $this->core->getUserInfo('role') == 'medis' || $this->core->getUserInfo('role') == 'paramedis'}
               <li><a href="#soap" data-no_rawat="{$value.no_rawat}" data-no_rkm_medis="{$value.no_rkm_medis}" data-nm_pasien="{$value.nm_pasien}">SOAP & Pemeriksaan</a></li>
+              <li><a href="#resepdokter" data-no_rawat="{$value.no_rawat}" data-no_rkm_medis="{$value.no_rkm_medis}" data-nm_pasien="{$value.nm_pasien}">Input Resep Dokter</a></li>
               <li><a href="#layanan_obat" data-no_rawat="{$value.no_rawat}" data-no_rkm_medis="{$value.no_rkm_medis}" data-nm_pasien="{$value.nm_pasien}">Layanan & Tindakan</a></li>
               <li><a href="#berkas_digital" data-no_rawat="{$value.no_rawat}" data-no_rkm_medis="{$value.no_rkm_medis}" data-nm_pasien="{$value.nm_pasien}">Berkas Digital</a></li>
               <li><a href="#status_rawat" data-no_rawat="{$value.no_rawat}" data-stts="{$value.stts}">Status Rawat</a></li>
@@ -158,10 +159,36 @@
     }, function(data) {
       // tampilkan data
       $("#form_rincian").hide();
+      $("#form_resepdokter").hide();
       $("#form").hide();
       $("#notif").hide();
       $("#form_soap").show();
       $("#soap").html(data).show();
+    });
+  });
+
+  $('a[href="#resepdokter"]').click(function(event){
+    var baseURL = mlite.url + '/' + mlite.admin;
+    event.preventDefault();
+
+    var no_rawat = $(this).attr("data-no_rawat");
+    var no_rkm_medis = $(this).attr("data-no_rkm_medis");
+    var nm_pasien = $(this).attr("data-nm_pasien");
+
+    $('input:text[name=no_rawat]').val(no_rawat);
+    $('input:text[name=no_rkm_medis]').val(no_rkm_medis);
+    $('input:text[name=nm_pasien]').val(nm_pasien);
+    $("#display").hide();
+
+    var url = baseURL + '/rawat_jalan/resepdokter?t=' + mlite.token;
+    $.post(url, {no_rawat : no_rawat,
+    }, function(data) {
+      // tampilkan data
+      $("#form_resepdokter").show();
+      $("#form_rincian").hide();
+      $("#form").hide();
+      $("#notif").hide();
+      $("#resepdokter").html(data).show();
     });
   });
 
@@ -182,6 +209,7 @@
     $.post(url, {no_rawat : no_rawat,
     }, function(data) {
       // tampilkan data
+      $("#form_resepdokter").hide();
       $("#form_rincian").show();
       $("#form").hide();
       $("#notif").hide();
@@ -418,6 +446,7 @@
       console.log(data);
       // tampilkan data
       $("#form_rincian").hide();
+      $("#form_resepdokter").hide();
       $("#form").hide();
       $("#notif").hide();
       $("#form_soap").hide();

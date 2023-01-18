@@ -48,6 +48,7 @@
         </div>
         <div class="row">
           {include: ../plugins/rawat_jalan/view/admin/form.rincian.html}
+          {include: ../plugins/rawat_jalan/view/admin/form.resepdokter.html}
           {include: ../plugins/rawat_jalan/view/admin/form.soap.html}
           {include: ../plugins/rawat_jalan/view/admin/form.berkasdigital.html}
           {include: ../plugins/rawat_jalan/view/admin/form.kontrol.html}
@@ -57,6 +58,7 @@
         </div>
         <div>
           <div id="rincian"></div>
+          <div id="resepdokter"></div>
           <div id="soap"></div>
           <div id="sep"></div>
           <div id="surat_kontrol"></div>
@@ -69,7 +71,7 @@
 <script type="text/javascript">
    $(function () {
        $('.periode_rawat_jalan').datetimepicker({
-         defaultDate: '{?=date('Y-m-d')?}',
+         defaultDate: `{?=date('Y-m-d')?}`,
          format: 'YYYY-MM-DD',
          locale: 'id'
        });

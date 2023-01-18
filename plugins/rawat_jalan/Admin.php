@@ -1108,6 +1108,59 @@ class Admin extends AdminModule
     exit();
   }
 
+  public function anyResepdokter()
+  {
+    echo $this->draw('resepdokter.html');
+    exit();
+  }
+
+  public function postSimpanresep()
+  {
+    // get doctor from no_rawat
+    $rawat_jl_dr = $this->core->mysql('rawat_jl_dr')->where('no_rawat', $_POST['no_rawat'])->oneArray();
+    $dokter = $rawat_jl_dr['kd_dokter'];
+
+    // insert into resep_obat
+    $resep_obat = $this->core->mysql('resep_obat');
+
+    $max_id = $this->core->mysql('resep_obat')->select(['no_resep' => 'ifnull(MAX(CONVERT(RIGHT(no_resep,4),signed)),0)'])->where('tgl_peresepan', $_POST['tgl_perawatan'])->oneArray();
+    if(empty($max_id['no_resep'])) {
+      $max_id['no_resep'] = '0000';
+    }
+    $_next_no_resep = sprintf('%04s', ($max_id['no_resep'] + 1));
+    $no_resep = date('Ymd').''.$_next_no_resep;
+
+    $query = $resep_obat->save(
+              [
+                'no_resep' => $no_resep,
+                'tgl_perawatan' => $_POST['tgl_perawatan'],
+                'jam' => $_POST['jam_reg'],
+                'no_rawat' => $_POST['no_rawat'],
+                'kd_dokter' => $dokter,
+                'tgl_peresepan' => $_POST['tgl_perawatan'],
+                'jam_peresepan' => $_POST['jam_reg'],
+                'status' => 'ralan'
+              ]
+    );
+
+    // $query = $this->core->mysql('berkas_digital_perawatan')->save(['no_rawat' => $_POST['no_rawat'], 'kode' => $_POST['kode'], 'lokasi_file' => $lokasi_file]);
+    if ($query) {
+      for($i=0; $i<count($_POST['resep_dokter']); $i++) {
+        $resep_dokter = $this->core->mysql('resep_dokter');
+        $query = $resep_dokter->save(
+                  [
+                    'no_resep' => $no_resep,
+                    'kode_brng' => $_POST['resep_dokter'][$i]['kode_brng'],
+                    'jml' => $_POST['resep_dokter'][$i]['jml'],
+                    'aturan_pakai' => $_POST['resep_dokter'][$i]['aturan_pakai'],
+                  ]
+        );
+      }
+      return $dokter;
+    }
+    return false;
+  }
+
   public function anySoap()
   {
 
@@ -1213,6 +1266,21 @@ class Admin extends AdminModule
       ->limit(10)
       ->toArray();
     echo $this->draw('layanan.html', ['layanan' => $layanan]);
+    exit();
+  }
+
+  public function anyObat()
+  {
+    $obat = $this->core->mysql('databarang')
+      ->join('gudangbarang', 'gudangbarang.kode_brng = databarang.kode_brng')
+      ->group('databarang.kode_brng')
+      ->select('databarang.kode_brng, databarang.nama_brng, databarang.kode_sat, databarang.ralan ,sum(gudangbarang.stok) as stok')
+      ->where('status', '0')
+      ->where('gudangbarang.stok', '>', '0')
+      ->like('nama_brng', '%' . $_POST['namaobat'] . '%')
+      ->limit(10)
+      ->toArray();
+    echo $this->draw('listobat.html', ['obat' => $obat]);
     exit();
   }
 

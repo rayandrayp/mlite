@@ -1,0 +1,33 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+      <div class="table-responsive no-margin">
+        <table class="table table-stripped">
+          <thead>
+            <tr>
+              <th>ID Barang</th>
+              <th>Nama Obat</th>
+              <th>Harga</th>
+              <th>Stok</th>
+            </tr>
+          </thead>
+          <tbody>
+            {if: $obat}
+            {loop: $obat}
+            <tr class="pilih_listobat" data-kode_brng="{$value.kode_brng}" data-nama_brng="{$value.nama_brng}" data-ralan="{$value.ralan}" data-kat="{$value.ralan}">
+              <td>{$value.kode_brng}</td>
+              <td>{$value.nama_brng}</td>
+              <td>Rp. <span class="pull-right">{?= number_format($value.ralan,2,',','.')?}</span></td>
+              <td>{$value.stok}</td>
+            </tr>
+            {/loop}
+            {else}
+            <tr>
+              <td colspan="3"class="text-center">Data layanan tidak ditemukan.</td>
+            </tr>
+            {/if}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  

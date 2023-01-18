@@ -1,5 +1,6 @@
 // sembunyikan form dan notif
 $("#form_rincian").hide();
+$("#form_resepdokter").hide();
 $("#form_soap").hide();
 $("#form_sep").hide();
 $("#form_berkasdigital").hide();
@@ -8,6 +9,8 @@ $("#notif").hide();
 $('#provider').hide();
 $('#aturan_pakai').hide();
 $("#form_kontrol").hide();
+
+let listObat = [];
 
 // tombol buka form diklik
 $("#index").on('click', '#bukaform', function(){
@@ -261,6 +264,7 @@ $("#display").on("click", ".sep", function(event){
   $('input:text[name=no_kartu_rs]').val(no_peserta);
   $("#display").hide();
   $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
   $("#form").hide();
   $("#notif").hide();
   $("#form_soap").hide();
@@ -289,6 +293,7 @@ $('#manage').on('click', '#submit_periode_rawat_jalan', function(event){
     $("#form").show();
     $("#display").html(data).show();
     $("#form_rincian").hide();
+    $("#form_resepdokter").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -323,6 +328,7 @@ $('#manage').on('click', '#belum_periode_rawat_jalan', function(event){
     $("#form").show();
     $("#display").html(data).show();
     $("#form_rincian").hide();
+    $("#form_resepdokter").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -357,6 +363,7 @@ $('#manage').on('click', '#selesai_periode_rawat_jalan', function(event){
     $("#form").show();
     $("#display").html(data).show();
     $("#form_rincian").hide();
+    $("#form_resepdokter").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -391,6 +398,7 @@ $('#manage').on('click', '#lunas_periode_rawat_jalan', function(event){
     $("#form").show();
     $("#display").html(data).show();
     $("#form_rincian").hide();
+    $("#form_resepdokter").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -604,10 +612,47 @@ $("#form_rincian").on("click", "#selesai", function(event){
   bersih();
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
+  $("#form_soap").hide();
+  $('#resepdokter').hide();
+  $("#form").show();
+  $("#display").show();
+  $("#rincian").hide();
+  $("#soap").hide();
+  $("#berkasdigital").hide();
+  $("#form_kontrol").hide();
+  $("#kontrol").hide();
+  $("#form_kontrol").hide();
+});
+
+// tombol batal diklik
+$("#form_resepdokter").on("click", "#selesai", function(event){
+  const no_rawat = $('input:text[name=no_rawat]').val();
+  const tgl_perawatan = $('input:text[name=tgl_perawatan]').val();
+  const jam_reg = $('input:text[name=jam_reg]').val();
+
+  // send data to server
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url = baseURL + '/rawat_jalan/simpanresep?t=' + mlite.token;
+  $.post(url, {
+    no_rawat: no_rawat,
+    tgl_perawatan: tgl_perawatan,
+    jam_reg: jam_reg,
+    resep_dokter: listObat,
+  },
+  function(data) {
+    console.log(data);
+  });
+
+  bersih();
+  $("#form_berkasdigital").hide();
+  $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
   $("#form_soap").hide();
   $("#form").show();
   $("#display").show();
   $("#rincian").hide();
+  $("#resepdokter").hide();
   $("#soap").hide();
   $("#berkasdigital").hide();
   $("#form_kontrol").hide();
@@ -620,6 +665,7 @@ $("#form_soap").on("click", "#selesai_soap", function(event){
   bersih();
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
   $("#form_soap").hide();
   $("#form").show();
   $("#display").show();
@@ -636,6 +682,7 @@ $("#form_kontrol").on("click", "#selesai_kontrol", function(event){
   bersih();
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
   $("#form_soap").hide();
   $("#form").show();
   $("#display").show();
@@ -718,7 +765,6 @@ $('input:text[name=layanan]').on('input',function(e){
         $("#obat").hide();
       });
   }
-
 });
 // end pencarian
 
@@ -738,6 +784,44 @@ $("#layanan").on("click", ".pilih_layanan", function(event){
   $('input:hidden[name=kat]').val(kat);
 
   $("#layanan").hide();
+  $('#provider').show();
+  $('#aturan_pakai').hide();
+  $("#form_kontrol").hide();
+});
+
+// ketika inputbox pencarian diisi
+$('input:text[name=namaobat]').on('input',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/obat?t=' + mlite.token;
+  var namaobat = $('input:text[name=namaobat]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+  console.log('aaaaa');
+
+  if(namaobat!="") {
+      $.post(url, {namaobat: namaobat, no_rawat: no_rawat} ,function(data) {
+      // tampilkan data yang sudah di perbaharui
+        $("#listobat").html(data).show();
+        $("#obat").hide();
+      });
+  }
+});
+// end pencarian
+
+$("#listobat").on("click", ".pilih_listobat", function(event){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  event.preventDefault();
+
+  var kode_brng = $(this).attr("data-kode_brng");
+  var nama_brng = $(this).attr("data-nama_brng");
+  var ralan = $(this).attr("data-ralan");
+  var kat = $(this).attr("data-kat");
+
+  $('input:hidden[name=kode_brng]').val(kode_brng);
+  $('input:text[name=nama_brng]').val(nama_brng);
+  $('input:text[name=ralan]').val(ralan);
+  $('input:hidden[name=kat]').val(kat);
+
+  $("#listobat").hide();
   $('#provider').show();
   $('#aturan_pakai').hide();
   $("#form_kontrol").hide();
@@ -843,6 +927,60 @@ $("#form_rincian").on("click", "#simpan_rincian", function(event){
     "</div>").show();
   });
 });
+
+$("#form_resepdokter").on("click", "#simpan_resep", function(event){
+
+  var kode_brng = $('input:hidden[name=kode_brng]').val();
+  var nama_brng = $('input:text[name=nama_brng]').val();
+  var jml = $('input:text[name=jml]').val();
+  var aturan = $('input:text[name=aturan]').val();
+  var ralan = $('input:text[name=ralan]').val();
+  var subtotal = ralan * jml;
+
+  const obat ={
+    kode_brng: kode_brng,
+    jml: jml,
+    aturan_pakai: aturan,
+    subtotal: subtotal
+  };
+
+  listObat.push(obat);
+  const totalBayar = listObat.reduce((total, obat) => total + obat.subtotal, 0);
+
+  // show total on total-harga-resep
+  $('#total-harga-resep').html(totalBayar);
+
+  $('#body-list-resep').append(`
+    <tr>
+      <td>${nama_brng}</td>
+      <td>${aturan}</td>
+      <td>${jml}</td>
+      <td>${subtotal}</td>
+      <td><button class="btn btn-danger hapus_resep" data-kode_brng="${$('input:hidden[name=kode_brng]').val()}">Hapus</button></td>
+    </tr>
+  `);
+
+  // reset input
+  $('input:hidden[name=kode_brng]').val("");
+  $('input:text[name=nama_brng]').val("");
+  $('input:text[name=jml]').val("");
+  $('input:text[name=aturan]').val("-");
+  $('input:text[name=ralan]').val("");
+  $('input:text[name=namaobat]').val("");
+});
+
+$('#resepdokter').on("click",".hapus_resep", function(event){
+  event.preventDefault();
+  const kode_brng = $(this).attr("data-kode_brng");
+  const index = listObat.findIndex(obat => obat.kode_brng === kode_brng);
+  listObat.splice(index, 1);
+  // remove component from table
+  $(this).parent().parent().remove();
+  // show total on total-harga-resep
+  $('#total-harga-resep').html(listObat.reduce((total, obat) => total + obat.subtotal, 0));
+});
+
+
 
 // ketika tombol hapus ditekan
 $("#rincian").on("click",".hapus_detail", function(event){
