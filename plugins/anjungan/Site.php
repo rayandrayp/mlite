@@ -2906,10 +2906,10 @@ class Site extends SiteModule
         break;
 
         case "get-daftar":
-          if(!empty($_POST['no_rkm_medis_daftar'])){
+          if(!empty($_POST['no_peserta'])){
               $data = array();
               $query = $this->core->mysql('pasien')
-                ->where('no_rkm_medis', $_POST['no_rkm_medis_daftar'])
+                ->where('no_peserta', $_POST['no_peserta'])
                 ->oneArray();
               if(!empty($query)){
                   $data['status'] = 'ok';
