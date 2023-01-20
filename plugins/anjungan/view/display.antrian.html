@@ -1035,12 +1035,12 @@
                     dataType: "json",
                     data: {
                         jenis: value,
-                        no_rkm_medis: no_rkm_medis_daftar,
+                        no_rkm_medis_daftar: no_rkm_medis_daftar,
                         nik: nik,
-                        tgl_registrasi: tgl_registrasi_daftar,
-                        kd_poli: kd_poli_daftar,
+                        tgl_registrasi_daftar: tgl_registrasi_daftar,
+                        kd_poli_daftar: kd_poli_daftar,
                         kodesubspesialis: kodesubspesialis,
-                        kd_dokter: kd_dokter_daftar,
+                        kd_dokter_daftar: kd_dokter_daftar,
                         kd_pj: kd_pj ?? 'A09',
                         jeniskunjungan: jeniskunjungan,
                         no_rujukan_daftar: no_rujukan_daftar,
@@ -1329,12 +1329,18 @@
                 console.log(jsonData);
                 console.log(jsonData.noKartu);
 
+                console.log('nomor rujukan :');
+                console.log(jsonData.noRujukan);
+                console.log('nik :');
+                console.log(jsonData.nik);
+
                 $.ajax({
                     type: 'POST',
                     url: '{?=url()?}/anjungan/ajax?show=get-daftar',
                     dataType: "json",
                     data: {
-                        no_peserta: nomor
+                        // no_peserta: nomor
+                        no_rkm_medis_daftar: jsonData.noRujukan
                     },
                     success: function(data) {
                         if (data.status == 'ok') {
