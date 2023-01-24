@@ -425,7 +425,7 @@
   		dataType: 'json',
   		data: {
   			noantrian: noantrian,
-  			type: '{?=str_replace("panggil_","",$_GET['show'])?}',
+  			type: '{?=str_replace("panggil_","",$_GET[`show`])?}',
   			loket: loket,
   		},
   		success: function(data) {
@@ -440,7 +440,7 @@
   $("#form_simpan_no_rkm_medis_{$value}").on("click", ".simpan_no_rkm_medis_{$value}", function(event){
     var noantrian = $('input:hidden[name=noantrian]').val();
     var no_rkm_medis = $('input:text[name=no_rkm_medis_{$value}]').val();
-    var type = '{?=str_replace("panggil_","",$_GET['show'])?}';
+    var type = '{?=str_replace("panggil_","",$_GET[`show`])?}';
     alert(no_rkm_medis);
     $.ajax({
         url: '{?=url()?}/anjungan/simpannorm',
