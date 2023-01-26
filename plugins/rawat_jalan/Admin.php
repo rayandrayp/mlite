@@ -1114,6 +1114,12 @@ class Admin extends AdminModule
     exit();
   }
 
+  public function anyPemeriksaanRadiologi()
+  {
+    echo $this->draw('pemeriksaanradiologi.html');
+    exit();
+  }
+
   public function postSimpanresep()
   {
     // get doctor from no_rawat
@@ -1157,6 +1163,51 @@ class Admin extends AdminModule
         );
       }
       return $dokter;
+    }
+    return false;
+  }
+
+  public function postSimpanPermintaanRadiologi()
+  {
+    $nomor_rawat = $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray();
+    $dokter = $nomor_rawat['kd_dokter']; 
+
+    // insert into permintaan_radiologi
+    $permintaan_radiologi = $this->core->mysql('permintaan_radiologi');
+
+    $max_id = $this->core->mysql('permintaan_radiologi')->select(['noorder' => 'ifnull(MAX(CONVERT(RIGHT(noorder,4),signed)),0)'])->where('tgl_permintaan', $_POST['tgl_permintaan'])->oneArray();
+    if(empty($max_id['noorder'])) {
+      $max_id['noorder'] = '0000';
+    }
+    $_next_noorder = sprintf('%04s', ($max_id['noorder'] + 1));
+    $noorder = 'PR'.date('Ymd').$_next_noorder;
+
+    $query = $permintaan_radiologi->save(
+              [
+                'noorder' => $noorder,
+                'no_rawat' => $_POST['no_rawat'],
+                'tgl_permintaan' => $_POST['tgl_permintaan'],
+                'jam_permintaan' => $_POST['jam_permintaan'],
+                'tgl_sampel'=> "0000-00-00",
+                'jam_sampel' => "00:00:00",
+                'tgl_hasil' => "0000-00-00",
+                'jam_hasil' => "00:00:00",
+                'dokter_perujuk' => $dokter,
+                'status'=> "ralan",
+                'informasi_tambahan' => $_POST['informasi_tambahan'],
+                'diagnosa_klinis' => $_POST['diagnosa_klinis'],
+              ]);
+    if ($query) {
+      foreach ($_POST['permintaan_radiologi'] as $row) {
+        $permintaan_pemeriksaan_radiologi = $this->core->mysql('permintaan_pemeriksaan_radiologi');
+        $query = $permintaan_pemeriksaan_radiologi->save(
+                  [
+                    'noorder' => $noorder,
+                    'kd_jenis_prw' => $row['kd_jenis_prw'],
+                    'stts_bayar' => 'Belum',
+                  ]);
+      }
+      return $noorder;
     }
     return false;
   }
@@ -1281,6 +1332,17 @@ class Admin extends AdminModule
       ->limit(10)
       ->toArray();
     echo $this->draw('listobat.html', ['obat' => $obat]);
+    exit();
+  }
+
+  public function anyPerawatanRadiologi()
+  {
+    $pemeriksaan_radiologi = $this->core->mysql('jns_perawatan_radiologi')
+      ->where('status', '1')
+      ->like('nm_perawatan', '%' . $_POST['namapemeriksaanradiologi'] . '%')
+      ->limit(10)
+      ->toArray();
+    echo $this->draw('listpemeriksaanradiologi.html', ['pemeriksaan_radiologi' => $pemeriksaan_radiologi]);
     exit();
   }
 
