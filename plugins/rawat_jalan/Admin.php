@@ -1150,8 +1150,14 @@ class Admin extends AdminModule
 
   public function postSimpanresep()
   {
+    // check if $_POST['resep_dokter'] is empty
+    if(empty($_POST['resep_dokter'])) {
+      http_response_code(400);
+      return json_encode(['status' => 'error', 'message' => 'Resep dokter tidak boleh kosong']);
+    }
+
     // get doctor from no_rawat
-    $rawat_jl_dr = $this->core->mysql('rawat_jl_dr')->where('no_rawat', $_POST['no_rawat'])->oneArray();
+    $rawat_jl_dr = $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray();
     $dokter = $rawat_jl_dr['kd_dokter'];
 
     // insert into resep_obat
@@ -1164,35 +1170,38 @@ class Admin extends AdminModule
     $_next_no_resep = sprintf('%04s', ($max_id['no_resep'] + 1));
     $no_resep = date('Ymd').''.$_next_no_resep;
 
-    $query = $resep_obat->save(
-              [
-                'no_resep' => $no_resep,
-                'tgl_perawatan' => $_POST['tgl_perawatan'],
-                'jam' => $_POST['jam_reg'],
-                'no_rawat' => $_POST['no_rawat'],
-                'kd_dokter' => $dokter,
-                'tgl_peresepan' => $_POST['tgl_perawatan'],
-                'jam_peresepan' => $_POST['jam_reg'],
-                'status' => 'ralan'
-              ]
-    );
-
-    // $query = $this->core->mysql('berkas_digital_perawatan')->save(['no_rawat' => $_POST['no_rawat'], 'kode' => $_POST['kode'], 'lokasi_file' => $lokasi_file]);
-    if ($query) {
-      for($i=0; $i<count($_POST['resep_dokter']); $i++) {
-        $resep_dokter = $this->core->mysql('resep_dokter');
-        $query = $resep_dokter->save(
-                  [
-                    'no_resep' => $no_resep,
-                    'kode_brng' => $_POST['resep_dokter'][$i]['kode_brng'],
-                    'jml' => $_POST['resep_dokter'][$i]['jml'],
-                    'aturan_pakai' => $_POST['resep_dokter'][$i]['aturan_pakai'],
-                  ]
-        );
+    try {
+      $query = $resep_obat->save(
+        [
+          'no_resep' => $no_resep,
+          'tgl_perawatan' => $_POST['tgl_perawatan'],
+          'jam' => $_POST['jam_reg'],
+          'no_rawat' => $_POST['no_rawat'],
+          'kd_dokter' => $dokter,
+          'tgl_peresepan' => $_POST['tgl_perawatan'],
+          'jam_peresepan' => $_POST['jam_reg'],
+          'status' => 'ralan'
+        ]
+      );
+      if ($query) {
+        for($i=0; $i<count($_POST['resep_dokter']); $i++) {
+          $resep_dokter = $this->core->mysql('resep_dokter');
+          $query = $resep_dokter->save(
+                    [
+                      'no_resep' => $no_resep,
+                      'kode_brng' => $_POST['resep_dokter'][$i]['kode_brng'],
+                      'jml' => $_POST['resep_dokter'][$i]['jml'],
+                      'aturan_pakai' => $_POST['resep_dokter'][$i]['aturan_pakai'],
+                    ]
+          );
+        }
       }
-      return $dokter;
+    } catch (PDOException  $th) {
+      http_response_code(400);
+      return json_encode(['status' => 'error', 'message' => $th->getMessage()]);
     }
-    return false;
+    http_response_code(200);
+    return json_encode(['status' => 'success', 'message' => 'Data berhasil disimpan']);
   }
 
   public function postSimpanPermintaanRadiologi()

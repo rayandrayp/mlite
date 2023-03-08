@@ -650,11 +650,23 @@ $("#form_resepdokter").on("click", "#selesai", function(event){
   // send data to server
   var baseURL = mlite.url + '/' + mlite.admin;
   var url = baseURL + '/rawat_jalan/simpanresep?t=' + mlite.token;
-  $.post(url, {
-    no_rawat: no_rawat,
-    tgl_perawatan: tgl_perawatan,
-    jam_reg: jam_reg,
-    resep_dokter: listObat,
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: {
+      no_rawat: no_rawat,
+      tgl_perawatan: tgl_perawatan,
+      jam_reg: jam_reg,
+      resep_dokter: listObat,
+    },
+    success: function(data) {
+      console.log(data);
+      alert('Data berhasil disimpan');
+    },
+    error: function(data) {
+      console.log(data);
+      alert('Data gagal disimpan');
+    }
   });
 
   cleanFormResepDokter();
@@ -670,13 +682,25 @@ $('#form_pemeriksaanradiologi').on('click', '#selesai', function(event) {
   // send data to server
   var baseURL = mlite.url + '/' + mlite.admin;
   var url = baseURL + '/rawat_jalan/simpanpermintaanradiologi?t=' + mlite.token;
-  $.post(url, {
-    no_rawat: no_rawat,
-    tgl_permintaan: tgl_permintaan,
-    jam_permintaan: jam_permintaan,
-    informasi_tambahan: informasi_tambahan,
-    diagnosa_klinis: diagnosa_klinis,
-    permintaan_radiologi: listPemeriksaanRadiologi,
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: {
+      no_rawat: no_rawat,
+      tgl_permintaan: tgl_permintaan,
+      jam_permintaan: jam_permintaan,
+      informasi_tambahan: informasi_tambahan,
+      diagnosa_klinis: diagnosa_klinis,
+      permintaan_radiologi: listPemeriksaanRadiologi,
+    },
+    success: function(data) {
+      console.log(data);
+      alert('Data berhasil disimpan!');
+    },
+    error: function(data) {
+      console.log(data);
+      alert('Data gagal disimpan!');
+    }
   });
   cleanFormRadiologi();
 });
@@ -707,7 +731,6 @@ $('#form_pemeriksaanlabpk').on('click', '#selesai', function(event) {
       alert('Data gagal disimpan!');
     }
   });
-
   cleanFormLabPK();
 });
 
