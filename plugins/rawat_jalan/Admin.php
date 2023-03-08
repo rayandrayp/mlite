@@ -859,6 +859,13 @@ class Admin extends AdminModule
       if (empty($this->core->mysql('temporary2')->where('temp2', $_POST['no_rawat'])->oneArray())) {
         $data['status'] = 'error';
         $data['message'] = 'Status pasien tidak runut, silahkan update "Berkas Diterima" terlebih dahulu.';
+        // get pasien from no_rawat
+        $pasien = $this->core->mysql('pasien')->where('no_rkm_medis', $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray()['no_rkm_medis'])->oneArray();
+        // get pasien no_telp
+        $no_telp = $pasien['no_tlp'];
+        // $data['whatsapp'] = $no_telp;
+        $nama = $pasien['nm_pasien'];
+        $data['whatsapp'] = $this->postWhatsapp($no_telp, $nama);
         echo json_encode($data);
       } else {
         $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->save($_POST);
@@ -878,6 +885,14 @@ class Admin extends AdminModule
         }
         $data['status'] = 'success';
         $data['message'] = 'Status pasien berhasil diubah.';
+
+        $pasien = $this->core->mysql('pasien')->where('no_rkm_medis', $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray()['no_rkm_medis'])->oneArray();
+        // get pasien no_telp
+        $no_telp = $pasien['no_tlp'];
+        // $data['whatsapp'] = $no_telp;
+        // get pasien nama
+        $nama = $pasien['nm_pasien'];
+        $data['whatsapp'] = $this->postWhatsapp($no_telp, $nama);
         echo json_encode($data);
       }
     } else if ($_POST['stts'] == 'Batal') { //pasien batal dilayani
@@ -1120,6 +1135,19 @@ class Admin extends AdminModule
     exit();
   }
 
+  public function anyPemeriksaanLabPK()
+  {
+    echo $this->draw('pemeriksaanlabpk.html');
+    exit();
+  }
+
+  public function getListDokterPK()
+  {
+    $rows = $this->core->mysql('dokter')->where('kd_sps', 'Sp.PK')->toArray();
+    echo json_encode($rows);
+    exit();
+  }
+
   public function postSimpanresep()
   {
     // get doctor from no_rawat
@@ -1211,6 +1239,70 @@ class Admin extends AdminModule
     }
     return false;
   }
+
+  public function postSimpanPermintaanLabPK()
+  {
+    $nomor_rawat = $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray();
+    $dokter = $nomor_rawat['kd_dokter']; 
+
+    // insert into permintaan_radiologi
+    $permintaan_lab = $this->core->mysql('permintaan_lab');
+
+    $max_id = $this->core->mysql('permintaan_lab')->select(['noorder' => 'ifnull(MAX(CONVERT(RIGHT(noorder,4),signed)),0)'])->where('tgl_permintaan', $_POST['tgl_permintaan'])->oneArray();
+    if(empty($max_id['noorder'])) {
+      $max_id['noorder'] = '0000';
+    }
+    $_next_noorder = sprintf('%04s', ($max_id['noorder'] + 1));
+    $noorder = 'PL'.date('Ymd').$_next_noorder;
+
+    // check if $_POST['permintaan_lab_group'] is empty
+    if (empty($_POST['permintaan_lab'])) {
+      return http_response_code(400);
+    }
+
+    try {
+      $query = $permintaan_lab->save([
+          'noorder' => $noorder,
+          'no_rawat' => $_POST['no_rawat'],
+          'tgl_permintaan' => date('Y-m-d'),
+          'jam_permintaan' => date('H:i:s'),
+          'tgl_sampel'=> "0000-00-00",
+          'jam_sampel' => "00:00:00",
+          'tgl_hasil' => "0000-00-00",
+          'jam_hasil' => "00:00:00",
+          'dokter_perujuk' => $dokter,
+          'status'=> "ralan",
+          'informasi_tambahan' => $_POST['informasi_tambahan'],
+          'diagnosa_klinis' => $_POST['diagnosa_klinis'],
+      ]);
+      if ($query) {
+        foreach ($_POST['permintaan_lab_group'] as $row) {
+          $permintaan_pemeriksaan_lab = $this->core->mysql('permintaan_pemeriksaan_lab');
+          $query = $permintaan_pemeriksaan_lab->save(
+                    [
+                      'noorder' => $noorder,
+                      // 'kd_jenis_prw' => $row['kd_jenis_prw'],
+                      'kd_jenis_prw' => $row,
+                      'stts_bayar' => 'Belum',
+                    ]);
+        }
+        foreach($_POST['permintaan_lab'] as $row) {
+          $permintaan_detail_permintaan_lab = $this->core->mysql('permintaan_detail_permintaan_lab');
+          $query = $permintaan_detail_permintaan_lab->save(
+                    [
+                      'noorder' => $noorder,
+                      'kd_jenis_prw' => $row['kd_jenis_prw'],
+                      'id_template' => $row['id_template'],
+                      'stts_bayar' => 'Belum',
+                    ]);
+        }
+      }
+    } catch (\Throwable $th) {
+      return http_response_code(400);
+    }
+    return $noorder;
+  }
+    
 
   public function anySoap()
   {
@@ -1343,6 +1435,29 @@ class Admin extends AdminModule
       ->limit(10)
       ->toArray();
     echo $this->draw('listpemeriksaanradiologi.html', ['pemeriksaan_radiologi' => $pemeriksaan_radiologi]);
+    exit();
+  }
+
+  public function anyPerawatanLabPK()
+  {
+    $pemeriksaan_lab_pk = $this->core->mysql('jns_perawatan_lab')
+      ->where('status', '1')
+      ->like('nm_perawatan', '%' . $_POST['namapemeriksaanlabpk'] . '%')
+      ->where('kategori', 'PK')
+      ->limit(10)
+      ->toArray();
+    echo $this->draw('listpemeriksaanlabpk.html', ['pemeriksaan_lab_pk' => $pemeriksaan_lab_pk]);
+    exit();
+  }
+
+  public function anyDetailPerawatanLabPK()
+  {
+    $detail_pemeriksaan_lab_pk = $this->core->mysql('template_laboratorium')
+      ->where('kd_jenis_prw', $_POST['kd_jenis_prw'])
+      ->like('Pemeriksaan', '%' . $_POST['namapemeriksaanlabpk'] . '%')
+      ->limit(10)
+      ->toArray();
+    echo $this->draw('listdetailpemeriksaanlabpk.html', ['detail_pemeriksaan_lab_pk' => $detail_pemeriksaan_lab_pk]);
     exit();
   }
 

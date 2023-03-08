@@ -23,6 +23,13 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">Tindakan</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="namapemeriksaanradiologi" class="form-control"
+                                placeholder="Input jenis pemeriksaan" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="control-label col-sm-3">Informasi Tambahan</label>
                         <div class="col-sm-9">
                             <input type="text" id="informasi_tambahan" name="informasi_tambahan" class="form-control"
@@ -34,13 +41,6 @@
                         <div class="col-sm-9">
                             <input type="text" name="diagnosa_klinis" id="diagnosa_klinis" class="form-control"
                                 autocomplete="false" value="" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">Tindakan</label>
-                        <div class="col-sm-9">
-                            <input type="text" name="namapemeriksaanradiologi" class="form-control"
-                                placeholder="Input jenis pemeriksaan" value="" />
                         </div>
                     </div>
                 </div>
@@ -88,6 +88,10 @@
                         <button type="button" name="button" class="btn btn-success" id="selesai">
                             <i class="fa fa-check"></i>
                             <span class="hidden-xs"> Selesai</span>
+                        </button>
+                        <button type="button" name="button" class="btn btn-danger" id="batal">
+                            <i class="fa fa-close"></i>
+                            <span class="hidden-xs"> Batal</span>
                         </button>
                     </div>
                 </div>
