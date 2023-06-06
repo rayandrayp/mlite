@@ -1,0 +1,44 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="table-responsive no-margin">
+      <table class="table table-stripped">
+        <thead>
+          <tr>
+            <th>Kode Pemeriksaan</th>
+            <th>Pemeriksaan</th>
+            <th>LD</th>
+            <th>LA</th>
+            <th>PD</th>
+            <th>PA</th>
+            <th>Biaya</th>
+          </tr>
+        </thead>
+        <tbody>
+          {if: $detail_pemeriksaan_lab_pk} {loop: $detail_pemeriksaan_lab_pk}
+          <tr
+            class="pilih_listdetailpemeriksaanlabpk"
+            data-kd_jenis_prw="{$value.kd_jenis_prw}"
+            data-id_template="{$value.id_template}"
+            data-nm_perawatan="{$value.Pemeriksaan}"
+            data-biaya_item = "{$value.biaya_item}"
+          >
+            <td>{$value.id_template}</td>
+            <td>{$value.Pemeriksaan}</td>
+            <td>{$value.nilai_rujukan_ld}</td>
+            <td>{$value.nilai_rujukan_ld}</td>
+            <td>{$value.nilai_rujukan_pd}</td>
+            <td>{$value.nilai_rujukan_pa}</td>
+            <td>{$value.biaya_item}</td>
+          </tr>
+          {/loop} {else}
+          <tr>
+            <td colspan="3" class="text-center">
+              Data layanan tidak ditemukan.
+            </td>
+          </tr>
+          {/if}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

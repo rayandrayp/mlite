@@ -1,0 +1,101 @@
+<div id="form_pemeriksaanradiologi">
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="tgl_perawatan" class="col-sm-3 control-label">Tanggal</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="tgl_perawatan" name="tgl_perawatan" class="form-control tanggal"
+                                value="{?=date('Y-m-d')?}" />
+                        </div>
+                        <label for="pnd" class="col-sm-1 control-label">Jam</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="jam_reg" name="jam_reg" class="form-control jam"
+                                value="{?=date('H:i:s')?}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="taid_pendaftarannggal" class="col-sm-3 control-label">Id Rawat</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="no_rawat" placeholder="ID Rawat Jalan" class="form-control"
+                                value="" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">Tindakan</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="namapemeriksaanradiologi" class="form-control"
+                                placeholder="Input jenis pemeriksaan" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Informasi Tambahan</label>
+                        <div class="col-sm-9">
+                            <input type="text" id="informasi_tambahan" name="informasi_tambahan" class="form-control"
+                                autocomplete="false" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label col-sm-3">Diagnosa Klinis</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="diagnosa_klinis" id="diagnosa_klinis" class="form-control"
+                                autocomplete="false" value="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div id="listpemeriksaanradiologi"></div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="id_pasien" class="col-sm-3 control-label">Nomor RM</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="no_rkm_medis" class="form-control" placeholder="Nomor Rekam Medik"
+                                value="" readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nama_pasien" class="col-sm-3 control-label">Nama Pasien</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="nm_pasien" class="form-control" placeholder="Nama pasien" value=""
+                                readonly />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tgl_perawatan" class="col-sm-3 control-label">Jenis Perawatan</label>
+                        <div class="col-sm-4">
+                            <input type="hidden" name="kd_jenis_prw" class="form-control" value="" />
+                            <input type="text" name="nm_perawatan" class="form-control"
+                                placeholder="Nama tindakan/layanan" value="" readonly />
+                            <input type="hidden" name="kat" class="form-control" value="" />
+                        </div>
+                        <label for="pnd" class="col-sm-1 control-label">biaya</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="biaya" name="biaya" class="form-control" value="" readonly />
+                        </div>
+                    </div>
+                    <div class="m-t-xl">
+                        <button type="button" name="button" class="btn btn-primary"
+                            id="simpan_rincian_pemeriksaan_radiologi">
+                            <i class="fa fa-save"></i>
+                            <span class="hidden-xs"> Masukkan Rincian</span>
+                        </button>
+                        <button type="button" name="button" class="btn btn-success" id="selesai">
+                            <i class="fa fa-check"></i>
+                            <span class="hidden-xs"> Selesai</span>
+                        </button>
+                        <button type="button" name="button" class="btn btn-danger" id="batal">
+                            <i class="fa fa-close"></i>
+                            <span class="hidden-xs"> Batal</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

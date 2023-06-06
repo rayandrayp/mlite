@@ -1,0 +1,29 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="table-responsive no-margin">
+            <table class="table table-stripped">
+                <thead>
+                    <tr>
+                        <th>Kode Pemeriksaan</th>
+                        <th>Jenis Pemeriksaan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if: $pemeriksaan_lab_pk}
+                    {loop: $pemeriksaan_lab_pk}
+                    <tr class="pilih_listpemeriksaanlabpk" data-kd_jenis_prw="{$value.kd_jenis_prw}"
+                        data-nm_perawatan="{$value.nm_perawatan}">
+                        <td>{$value.kd_jenis_prw}</td>
+                        <td>{$value.nm_perawatan}</td>
+                    </tr>
+                    {/loop}
+                    {else}
+                    <tr>
+                        <td colspan="3" class="text-center">Data layanan tidak ditemukan.</td>
+                    </tr>
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

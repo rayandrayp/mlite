@@ -1,6 +1,8 @@
 // sembunyikan form dan notif
 $("#form_rincian").hide();
 $("#form_resepdokter").hide();
+$("#form_pemeriksaanradiologi").hide();
+$("#form_pemeriksaanlabpk").hide();
 $("#form_soap").hide();
 $("#form_sep").hide();
 $("#form_berkasdigital").hide();
@@ -11,6 +13,8 @@ $('#aturan_pakai').hide();
 $("#form_kontrol").hide();
 
 let listObat = [];
+let listPemeriksaanRadiologi = [];
+let listPemeriksaanLabPK = [];
 
 // tombol buka form diklik
 $("#index").on('click', '#bukaform', function(){
@@ -265,6 +269,8 @@ $("#display").on("click", ".sep", function(event){
   $("#display").hide();
   $("#form_rincian").hide();
   $("#form_resepdokter").hide();
+  $("#form_pemeriksaanradiologi").hide();
+  $("#form_pemeriksaanlabpk").hide();
   $("#form").hide();
   $("#notif").hide();
   $("#form_soap").hide();
@@ -272,7 +278,6 @@ $("#display").on("click", ".sep", function(event){
   $("#form_sep").show();
   $("#bukaform").hide();
 });
-
 
 $('#manage').on('click', '#submit_periode_rawat_jalan', function(event){
   var baseURL = mlite.url + '/' + mlite.admin;
@@ -294,6 +299,8 @@ $('#manage').on('click', '#submit_periode_rawat_jalan', function(event){
     $("#display").html(data).show();
     $("#form_rincian").hide();
     $("#form_resepdokter").hide();
+    $("#form_pemeriksaanradiologi").hide();
+    $("#form_pemeriksaanlabpk").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -329,6 +336,8 @@ $('#manage').on('click', '#belum_periode_rawat_jalan', function(event){
     $("#display").html(data).show();
     $("#form_rincian").hide();
     $("#form_resepdokter").hide();
+    $("#form_pemeriksaanradiologi").hide();
+    $("#form_pemeriksaanlabpk").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -364,6 +373,8 @@ $('#manage').on('click', '#selesai_periode_rawat_jalan', function(event){
     $("#display").html(data).show();
     $("#form_rincian").hide();
     $("#form_resepdokter").hide();
+    $("#form_pemeriksaanradiologi").hide();
+    $("#form_pemeriksaanlabpk").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -399,6 +410,8 @@ $('#manage').on('click', '#lunas_periode_rawat_jalan', function(event){
     $("#display").html(data).show();
     $("#form_rincian").hide();
     $("#form_resepdokter").hide();
+    $("#form_pemeriksaanradiologi").hide();
+    $("#form_pemeriksaanlabpk").hide();
     $("#form_soap").hide();
     $("#form_sep").hide();
     $("#notif").hide();
@@ -607,14 +620,17 @@ $("#soap").on("click",".hapus_soap", function(event){
   });
 });
 
-// tombol batal diklik
+// tombol selesai diklik
 $("#form_rincian").on("click", "#selesai", function(event){
   bersih();
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
   $("#form_resepdokter").hide();
+  $("#form_pemeriksaanradiologi").hide();
+  $("#form_pemeriksaanlabpk").hide();
   $("#form_soap").hide();
   $('#resepdokter').hide();
+  $('#pemeriksaan_radiologi').hide();
   $("#form").show();
   $("#display").show();
   $("#rincian").hide();
@@ -625,7 +641,7 @@ $("#form_rincian").on("click", "#selesai", function(event){
   $("#form_kontrol").hide();
 });
 
-// tombol batal diklik
+// tombol selesai diklik
 $("#form_resepdokter").on("click", "#selesai", function(event){
   const no_rawat = $('input:text[name=no_rawat]').val();
   const tgl_perawatan = $('input:text[name=tgl_perawatan]').val();
@@ -634,30 +650,88 @@ $("#form_resepdokter").on("click", "#selesai", function(event){
   // send data to server
   var baseURL = mlite.url + '/' + mlite.admin;
   var url = baseURL + '/rawat_jalan/simpanresep?t=' + mlite.token;
-  $.post(url, {
-    no_rawat: no_rawat,
-    tgl_perawatan: tgl_perawatan,
-    jam_reg: jam_reg,
-    resep_dokter: listObat,
-  },
-  function(data) {
-    console.log(data);
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: {
+      no_rawat: no_rawat,
+      tgl_perawatan: tgl_perawatan,
+      jam_reg: jam_reg,
+      resep_dokter: listObat,
+    },
+    success: function(data) {
+      console.log(data);
+      alert('Data berhasil disimpan');
+    },
+    error: function(data) {
+      console.log(data);
+      alert('Data gagal disimpan');
+    }
   });
 
-  bersih();
-  $("#form_berkasdigital").hide();
-  $("#form_rincian").hide();
-  $("#form_resepdokter").hide();
-  $("#form_soap").hide();
-  $("#form").show();
-  $("#display").show();
-  $("#rincian").hide();
-  $("#resepdokter").hide();
-  $("#soap").hide();
-  $("#berkasdigital").hide();
-  $("#form_kontrol").hide();
-  $("#kontrol").hide();
-  $("#form_kontrol").hide();
+  cleanFormResepDokter();
+});
+
+$('#form_pemeriksaanradiologi').on('click', '#selesai', function(event) {
+  const no_rawat = $('input:text[name=no_rawat]').val();
+  const tgl_permintaan = $('input:text[name=tgl_perawatan]').val();
+  const jam_permintaan = $('input:text[name=jam_reg]').val();
+  const informasi_tambahan = $('#informasi_tambahan').val();
+  const diagnosa_klinis = $('#diagnosa_klinis').val();
+
+  // send data to server
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url = baseURL + '/rawat_jalan/simpanpermintaanradiologi?t=' + mlite.token;
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: {
+      no_rawat: no_rawat,
+      tgl_permintaan: tgl_permintaan,
+      jam_permintaan: jam_permintaan,
+      informasi_tambahan: informasi_tambahan,
+      diagnosa_klinis: diagnosa_klinis,
+      permintaan_radiologi: listPemeriksaanRadiologi,
+    },
+    success: function(data) {
+      console.log(data);
+      alert('Data berhasil disimpan!');
+    },
+    error: function(data) {
+      console.log(data);
+      alert('Data gagal disimpan!');
+    }
+  });
+  cleanFormRadiologi();
+});
+
+$('#form_pemeriksaanlabpk').on('click', '#selesai', function(event) {
+  const no_rawat = $('input:text[name=no_rawat]').val();
+  const informasi_tambahan = $('input:text[name=informasi_tambahan_labpk]').val();
+  const diagnosa_klinis = $('input:text[name=diagnosa_klinis_labpk]').val();
+
+  // send data to server
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url = baseURL + '/rawat_jalan/simpanpermintaanlabpk?t=' + mlite.token;
+
+  $.ajax({
+    url: url,
+    type: 'POST',
+    data: {
+      no_rawat: no_rawat,
+      informasi_tambahan: informasi_tambahan,
+      diagnosa_klinis: diagnosa_klinis,
+      permintaan_lab: listPemeriksaanLabPK,
+      permintaan_lab_group: listPemeriksaanLabPK.map(item => item.kd_jenis_prw).filter((value, index, self) => self.indexOf(value) === index),
+    },
+    success: function(data) {
+      alert('Data berhasil disimpan!');
+    },
+    error: function(data) {
+      alert('Data gagal disimpan!');
+    }
+  });
+  cleanFormLabPK();
 });
 
 // tombol batal diklik
@@ -666,6 +740,8 @@ $("#form_soap").on("click", "#selesai_soap", function(event){
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
   $("#form_resepdokter").hide();
+  $("#form_pemeriksaanradiologi").hide();
+  $("#form_pemeriksaanlabpk").hide();
   $("#form_soap").hide();
   $("#form").show();
   $("#display").show();
@@ -683,6 +759,8 @@ $("#form_kontrol").on("click", "#selesai_kontrol", function(event){
   $("#form_berkasdigital").hide();
   $("#form_rincian").hide();
   $("#form_resepdokter").hide();
+  $("#form_pemeriksaanradiologi").hide();
+  $("#form_pemeriksaanlabpk").hide();
   $("#form_soap").hide();
   $("#form").show();
   $("#display").show();
@@ -715,7 +793,6 @@ $("#kontrol").on("click",".hapus_kontrol", function(event){
         kd_poli: kd_poli,
         no_rkm_medis: no_rkm_medis
       } ,function(data) {
-        //console.log(data);
         var url = baseURL + '/rawat_jalan/kontrol?t=' + mlite.token;
         $.post(url, {no_rkm_medis : no_rkm_medis,
         }, function(data) {
@@ -795,7 +872,6 @@ $('input:text[name=namaobat]').on('input',function(e){
   var url    = baseURL + '/rawat_jalan/obat?t=' + mlite.token;
   var namaobat = $('input:text[name=namaobat]').val();
   var no_rawat = $('input:text[name=no_rawat]').val();
-  console.log('aaaaa');
 
   if(namaobat!="") {
       $.post(url, {namaobat: namaobat, no_rawat: no_rawat} ,function(data) {
@@ -806,6 +882,103 @@ $('input:text[name=namaobat]').on('input',function(e){
   }
 });
 // end pencarian
+
+$('input:text[name=namapemeriksaanradiologi]').on('input',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/perawatanradiologi?t=' + mlite.token;
+  var namapemeriksaanradiologi = $('input:text[name=namapemeriksaanradiologi]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+
+  if(namapemeriksaanradiologi!="") {
+      $.post(url, {namapemeriksaanradiologi: namapemeriksaanradiologi, no_rawat: no_rawat} ,function(data) {
+        // tampilkan data yang sudah di perbaharui
+        $("#listpemeriksaanradiologi").html(data).show();
+      });
+  }
+});
+
+$('input:text[name=namapemeriksaanradiologi]').on('click',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/perawatanradiologi?t=' + mlite.token;
+  var namapemeriksaanradiologi = $('input:text[name=namapemeriksaanradiologi]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+
+  $.post(url, {namapemeriksaanradiologi: namapemeriksaanradiologi, no_rawat: no_rawat} ,function(data) {
+    $("#listpemeriksaanradiologi").html(data).show();
+  });
+  
+});
+
+$('input:text[name=pemeriksaan-pk]').on('input',function(e){
+  console.log('test');
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/perawatanlabpk?t=' + mlite.token;
+  var namapemeriksaanlabpk = $('input:text[name=pemeriksaan-pk]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+
+  if(namapemeriksaanlabpk!="") {
+      $.post(url, {namapemeriksaanlabpk: namapemeriksaanlabpk, no_rawat: no_rawat} ,function(data) {
+        $("#listpemeriksaanlabpk").html(data).show();
+      });
+  }
+  $("#listdetailpemeriksaanlabpk").hide();
+});
+
+$('input:text[name=pemeriksaan-pk]').on('click',function(e){
+  console.log('test');
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/perawatanlabpk?t=' + mlite.token;
+  var namapemeriksaanlabpk = $('input:text[name=pemeriksaan-pk]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+
+  $.post(url, {namapemeriksaanlabpk: namapemeriksaanlabpk, no_rawat: no_rawat} ,function(data) {
+    $("#listpemeriksaanlabpk").html(data).show();
+  });
+  $("#listdetailpemeriksaanlabpk").hide();
+});
+
+$('input:text[name=detail-pemeriksaan-pk]').on('input',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/detailperawatanlabpk?t=' + mlite.token;
+  var namapemeriksaanlabpk = $('input:text[name=detail-pemeriksaan-pk]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+  var kd_jenis_prw = $('input:hidden[name=kd_jenis_prw]').val();
+
+  if(namapemeriksaanlabpk!="") {
+      $.post(url, {namapemeriksaanlabpk: namapemeriksaanlabpk, no_rawat: no_rawat, kd_jenis_prw: kd_jenis_prw} ,function(data) {
+        $("#listdetailpemeriksaanlabpk").html(data).show();
+      });
+  }
+});
+// check on text click
+$('input:text[name=detail-pemeriksaan-pk]').on('click',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/detailperawatanlabpk?t=' + mlite.token;
+  var namapemeriksaanlabpk = $('input:text[name=detail-pemeriksaan-pk]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+  var kd_jenis_prw = $('input:hidden[name=kd_jenis_prw]').val();
+
+  $.post(url, {namapemeriksaanlabpk: namapemeriksaanlabpk, no_rawat: no_rawat, kd_jenis_prw: kd_jenis_prw} ,function(data) {
+  // tampilkan data yang sudah di perbaharui
+    $("#listdetailpemeriksaanlabpk").html(data).show();
+  });
+});
+
+// check if press backspace or delete on detail-pemeriksaan-pk
+$('input:text[name=detail-pemeriksaan-pk]').on('keydown',function(e){
+  var baseURL = mlite.url + '/' + mlite.admin;
+  var url    = baseURL + '/rawat_jalan/detailperawatanlabpk?t=' + mlite.token;
+  var namapemeriksaanlabpk = $('input:text[name=detail-pemeriksaan-pk]').val();
+  var no_rawat = $('input:text[name=no_rawat]').val();
+  var kd_jenis_prw = $('input:hidden[name=kd_jenis_prw]').val();
+
+  if(e.keyCode == 8 || e.keyCode == 46) {
+    $.post(url, {namapemeriksaanlabpk: namapemeriksaanlabpk, no_rawat: no_rawat, kd_jenis_prw: kd_jenis_prw} ,function(data) {
+    // tampilkan data yang sudah di perbaharui
+      $("#listdetailpemeriksaanlabpk").html(data).show();
+    });
+  }
+});
 
 $("#listobat").on("click", ".pilih_listobat", function(event){
   var baseURL = mlite.url + '/' + mlite.admin;
@@ -826,6 +999,57 @@ $("#listobat").on("click", ".pilih_listobat", function(event){
   $('#aturan_pakai').hide();
   $("#form_kontrol").hide();
 });
+
+$("#listpemeriksaanradiologi").on("click", ".pilih_listpemeriksaanradiologi", function(event){
+  event.preventDefault();
+
+  var kd_jenis_prw = $(this).attr("data-kd_jenis_prw");
+  var nm_perawatan = $(this).attr("data-nm_perawatan");
+  var biaya = $(this).attr("data-total_byr");
+
+  $('input:hidden[name=kd_jenis_prw]').val(kd_jenis_prw);
+  $('input:text[name=nm_perawatan]').val(nm_perawatan);
+  $('input:text[name=biaya]').val(biaya);
+
+  $("#listpemeriksaanradiologi").hide();
+  $('#provider').show();
+  $('#aturan_pakai').hide();
+  $("#form_kontrol").hide();
+});
+
+$("#listpemeriksaanlabpk").on("click", ".pilih_listpemeriksaanlabpk", function(event){
+  event.preventDefault();
+
+  $('input:hidden[name=kd_jenis_prw]').val($(this).attr("data-kd_jenis_prw"));
+  $('input:text[name=pemeriksaan-pk]').val($(this).attr("data-nm_perawatan"));
+  $('input:text[name=nm_perawatan]').val($(this).attr("data-nm_perawatan"));
+
+  $("#listpemeriksaanlabpk").hide();
+  $('#provider').show();
+  $('#aturan_pakai').hide();
+  $("#form_kontrol").hide();
+});
+
+$("#listdetailpemeriksaanlabpk").on("click", ".pilih_listdetailpemeriksaanlabpk", function(event){
+  event.preventDefault();
+  
+  var kd_jenis_prw = $(this).attr("data-kd_jenis_prw");
+  var id_template = $(this).attr("data-id_template");
+  var nm_detail_perawatan = $(this).attr("data-nm_perawatan");
+  var biaya_item = $(this).attr("data-biaya_item");
+
+  $('input:hidden[name=kd_jenis_prw]').val(kd_jenis_prw);
+  $('input:hidden[name=id_template]').val(id_template);
+  $('input:text[name=nm_detail_perawatan]').val(nm_detail_perawatan);
+  $('input:text[name=biaya_item]').val(biaya_item);
+
+  $("#listdetailpemeriksaanlabpk").hide();
+  $('#provider').show();
+  $('#aturan_pakai').hide();
+  $("#form_kontrol").hide();
+});
+
+
 
 // ketika tombol panggil ditekan
 // $("#display").on("click",".panggil", function(event){
@@ -857,6 +1081,7 @@ $("#display").on("click",".panggilnomor", function(event){
   }
   play();
 });
+
 $("#display").on("click",".panggilnama", function(event){
   event.preventDefault();
 
@@ -969,6 +1194,107 @@ $("#form_resepdokter").on("click", "#simpan_resep", function(event){
   $('input:text[name=namaobat]').val("");
 });
 
+$("#form_resepdokter").on("click", "#batal", function(event){
+  cleanFormResepDokter();
+});
+
+$("#form_pemeriksaanradiologi").on("click", "#simpan_rincian_pemeriksaan_radiologi", function(event){
+  var no_rawat = $('input:hidden[name=no_rawat]').val();
+  var tgl_periksa = $('input:text[name=tgl_periksa]').val();
+  var jam = $('input:text[name=jam]').val();
+  var kd_jenis_prw = $('input:hidden[name=kd_jenis_prw]').val();
+  var nm_perawatan = $('input:text[name=nm_perawatan]').val();
+  var biaya = $('input:text[name=biaya]').val();
+
+  const pemeriksaan = {
+    no_rawat: no_rawat,
+    tgl_periksa: tgl_periksa,
+    jam: jam,
+    kd_jenis_prw: kd_jenis_prw,
+    nm_perawatan: nm_perawatan,
+    biaya: biaya
+  };
+
+  listPemeriksaanRadiologi.push(pemeriksaan);
+
+  const totalBayar = listPemeriksaanRadiologi.reduce((total, pemeriksaan) => total + parseInt(pemeriksaan.biaya), 0);
+
+  // show total on total-harga-resep  
+  $('#total-biaya-pemeriksaan-radiologi').html(totalBayar);
+
+  $('#body-list-pemeriksaan-radiologi').append(`
+    <tr>
+      <td>${kd_jenis_prw}</td>
+      <td>${nm_perawatan}</td>
+      <td>${biaya}</td>
+      <td><button class="btn btn-danger hapus_detail" data-kd_jenis_prw="${$('input:hidden[name=kd_jenis_prw]').val()}">Hapus</button></td>
+    </tr>
+  `);
+
+  // reset input
+  $('input:hidden[name=kd_jenis_prw]').val("");
+  $('input:text[name=nm_perawatan]').val("");
+  $('input:text[name=biaya]').val("");
+  $('input:text[name=namapemeriksaanradiologi]').val("");
+});
+
+$("#form_pemeriksaanradiologi").on("click", "#batal", function(event){
+  cleanFormRadiologi();
+});
+
+$("#form_pemeriksaanlabpk").on("click", "#simpan_rincian_pemeriksaan_labpk", function(event){
+  var no_rawat = $('input:hidden[name=no_rawat]').val();
+  // var tgl_periksa = $('input:text[name=tgl_periksa]').val();
+  // var jam = $('input:text[name=jam]').val();
+  var kd_jenis_prw = $('input:hidden[name=kd_jenis_prw]').val();
+  var id_template = $('input:hidden[name=id_template]').val();
+  var nm_perawatan = $('input:text[name=nm_perawatan]').val();
+  var nm_detail_perawatan = $('input:text[name=nm_detail_perawatan]').val();
+  var biaya_item = $('input:text[name=biaya_item]').val();
+
+  const pemeriksaan = {
+    no_rawat: no_rawat,
+    // tgl_periksa: tgl_periksa,
+    // jam: jam,
+    kd_jenis_prw: kd_jenis_prw,
+    id_template: id_template,
+    nm_perawatan: nm_perawatan,
+    nm_detail_perawatan: nm_detail_perawatan,
+    biaya_item: biaya_item
+  };
+
+  listPemeriksaanLabPK.push(pemeriksaan);
+  console.log("=========");
+  console.log(id_template);
+  console.log("=========");
+
+  const totalBayar = listPemeriksaanLabPK.reduce((total, pemeriksaan) => total + parseInt(pemeriksaan.biaya_item), 0);
+
+  // show total on total-harga-resep
+  $('#total-biaya-pemeriksaan-labpk').html(totalBayar);
+
+  $('#body-list-pemeriksaan-labpk').append(`
+    <tr>
+      <td>${kd_jenis_prw}</td>
+      <td>${nm_perawatan}</td>
+      <td>${nm_detail_perawatan}</td>
+      <td>${biaya_item}</td>
+      <td><button class="btn btn-danger hapus_detail" data-id_template="${$('input:hidden[name=id_template]').val()}">Hapus</button></td>
+    </tr>
+  `);
+
+  // reset input
+  // $('input:hidden[name=kd_jenis_prw]').val("");
+  // $('input:text[name=nm_perawatan]').val("");
+  $('input:text[name=nm_detail_perawatan]').val("");
+  $('input:text[name=biaya_item]').val("");
+  $('input:text[name=namapemeriksaanlabpk]').val("");
+});
+
+$("#form_pemeriksaanlabpk").on("click", "#batal", function(event){
+  cleanFormLabPK();
+});
+
 $('#resepdokter').on("click",".hapus_resep", function(event){
   event.preventDefault();
   const kode_brng = $(this).attr("data-kode_brng");
@@ -980,7 +1306,28 @@ $('#resepdokter').on("click",".hapus_resep", function(event){
   $('#total-harga-resep').html(listObat.reduce((total, obat) => total + obat.subtotal, 0));
 });
 
+$('#pemeriksaan_radiologi').on("click",".hapus_detail", function(event){
+  event.preventDefault();
+  const kd_jenis_prw = $(this).attr("data-kd_jenis_prw");
+  const index = listPemeriksaanRadiologi.findIndex(pemeriksaan => pemeriksaan.kd_jenis_prw === kd_jenis_prw);
+  listPemeriksaanRadiologi.splice(index, 1);
+  // remove component from table
+  $(this).parent().parent().remove();
+  // show total on total-harga-resep
+  $('#total-biaya-pemeriksaan-radiologi').html(listPemeriksaanRadiologi.reduce((total, pemeriksaan) => total + parseInt(pemeriksaan.biaya), 0));
+});
 
+$('#pemeriksaan_lab_pk').on("click",".hapus_detail", function(event){
+  event.preventDefault();
+  const id_template = $(this).attr("data-id_template");
+  console.log(id_template);
+  const index = listPemeriksaanLabPK.findIndex(pemeriksaan => pemeriksaan.id_template === id_template);
+  listPemeriksaanLabPK.splice(index, 1);
+  // remove component from table
+  $(this).parent().parent().remove();
+  // show total on total-harga-resep
+  $('#total-biaya-pemeriksaan-labpk').html(listPemeriksaanLabPK.reduce((total, pemeriksaan) => total + parseInt(pemeriksaan.biaya_item), 0));
+});
 
 // ketika tombol hapus ditekan
 $("#rincian").on("click",".hapus_detail", function(event){
@@ -1048,7 +1395,6 @@ $("#form_kontrol").on("click", "#simpan_kontrol", function(event){
   dokter : dokter,
   poli : poli
   }, function(data) {
-    //console.log(data);
     // tampilkan data
     $("#display").hide();
     var url = baseURL + '/rawat_jalan/kontrol?t=' + mlite.token;
@@ -1094,9 +1440,72 @@ function bersih(){
   $('input:text[name=no_reg]').val("");
 }
 
+function cleanFormLabPK(){
+  bersih();
+  console.log("batal");
+  $('input:hidden[name=kd_jenis_prw]').val("");
+  $('input:text[name=nm_perawatan]').val("");
+  $('input:text[name=biaya]').val("");
+  $('input:text[name=namapemeriksaanlab]').val("");
+  $('input:text[name=pemeriksaan-pk]').val("");
+  $('input:text[name=detail-pemeriksaan-pk]').val("");
+  $('input:text[name=informasi_tambahan_labpk]').val("");
+  $('input:text[name=diagnosa_klinis_labpk]').val("");
+  $('input:text[name=nm_detail_perawatan]').val("");
+  $("#form_pemeriksaanlabpk").hide();
+  $("#pemeriksaan_lab_pk").hide();
+  $("#listpemeriksaanlabpk").hide();
+  $('#listdetailpemeriksaanlabpk').hide();
+  $("#form").show();
+  $("#display").show();
+  $("#form_kontrol").hide();
+  $("#kontrol").hide();
+  listPemeriksaanLabPK = [];
+}
+
+function cleanFormRadiologi(){
+  bersih();
+  console.log("batal");
+  $('input:text[name=namapemeriksaanradiologi]').val("");
+  $('input:text[name=informasi_tambahan]').val("");
+  $('input:text[name=diagnosa_klinis]').val("");
+  $('input:text[name=nm_perawatan]').val("");
+  $('input:text[name=biaya]').val("");
+  $("#form_rincian").hide();
+  $("#form_pemeriksaanradiologi").hide();
+  $("#form").show();
+  $("#display").show();
+  $("#rincian").hide();
+  $('#pemeriksaan_radiologi').hide();
+  $("#kontrol").hide();
+  listPemeriksaanRadiologi = [];
+}
+
+function cleanFormResepDokter(){
+  bersih();
+  console.log("batal");
+  $('input:text[name=namaobat]').val("");
+  $('input:text[name=nama_brng]').val("");
+  $('input:text[name=ralan]').val("");
+  $('input:text[name=aturan]').val("");
+  $('input:text[name=jml]').val("");
+
+  $("#form_rincian").hide();
+  $("#form_resepdokter").hide();
+  $("#form").show();
+  $("#display").show();
+  $("#rincian").hide();
+  $("#resepdokter").hide();
+  $("#kontrol").hide();
+  $("#form_kontrol").hide();
+  listObat = [];
+}
+
+
 $(document).click(function (event) {
     $('.dropdown-menu[data-parent]').hide();
 });
+
 $(document).on('click', '.table-responsive [data-toggle="dropdown"]', function () {
     if ($('body').hasClass('modal-open')) {
         throw new Error("This solution is not working inside a responsive table inside a modal, you need to find out a way to calculate the modal Z-index and add it to the element")
@@ -1145,6 +1554,7 @@ $("#form").on("click","#jam_reg", function(event){
       $("#jam_reg").val(data);
     });
 });
+
 $("#form_soap").on("click","#jam_rawat", function(event){
     var baseURL = mlite.url + '/' + mlite.admin;
     var url = baseURL + '/rawat_jalan/cekwaktu?t=' + mlite.token;
