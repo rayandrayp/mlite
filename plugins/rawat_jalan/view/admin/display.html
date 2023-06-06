@@ -298,25 +298,69 @@
             console.log(result);
             // ketika ditekan tombol ok
             if (result){
-              // mengirimkan perintah penghapusan
-              $.post(url, {
-                no_rawat: no_rawat,
-                stts: result
-              } ,function(data) {
-                const res = JSON.parse(data);
-                console.log(res);
-                if (res.status == "error"){
-                    alert(res.message);
-                } else {
-                    alert(res.message);
-                    // sembunyikan form, tampilkan data yang sudah di perbaharui, tampilkan notif
-                    $("#display").load(baseURL + '/rawat_jalan/display?t=' + mlite.token);
-                    $('#notif').html("<div class=\"alert alert-success alert-dismissible fade in\" role=\"alert\" style=\"border-radius:0px;margin-top:-15px;\">" +
-                        "Status lanjut pasien telah disimpan!" +
-                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">&times;</button>" +
-                        "</div>").show();
-                }
-              });
+              if (result == 'Sudah'){
+                bootbox.prompt({
+                    title: "Status lanjut pasien.",
+                    message: '',
+                    inputType: 'radio',
+                    inputOptions: [{
+                            text: 'Tidak ada',
+                            value: 'Tidak ada',
+                        }, {
+                            text: 'Non racikan',
+                            value: 'Non racikan',
+                        }, {
+                            text: 'Racikan',
+                            value: 'Racikan',
+                        }],
+                    callback: function(jenisObat) {
+                        console.log('jenisobat ' . jenisObat);
+                        // ketika ditekan tombol ok
+                        if (jenisObat) {
+                            $.post(url, {
+                                no_rawat: no_rawat,
+                                stts: result,
+                                jenisObat: jenisObat
+                            }, function(data) {
+                                const res = JSON.parse(data);
+                                console.log(res);
+                                if (res.status == "error"){
+                                    alert(res.message);
+                                } else {
+                                    alert(res.message);
+                                    // sembunyikan form, tampilkan data yang sudah di perbaharui, tampilkan notif
+                                    $("#display").load(baseURL + '/rawat_jalan/display?t=' + mlite.token);
+                                    $('#notif').html("<div class=\"alert alert-success alert-dismissible fade in\" role=\"alert\" style=\"border-radius:0px;margin-top:-15px;\">" +
+                                        "Status lanjut pasien telah disimpan!" +
+                                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">&times;</button>" +
+                                        "</div>").show();
+                                }
+                            });
+                        }
+                    }
+                    
+                });
+              } else {
+                // mengirimkan perintah penghapusan
+                $.post(url, {
+                  no_rawat: no_rawat,
+                  stts: result
+                } ,function(data) {
+                  const res = JSON.parse(data);
+                  console.log(res);
+                  if (res.status == "error"){
+                      alert(res.message);
+                  } else {
+                      alert(res.message);
+                      // sembunyikan form, tampilkan data yang sudah di perbaharui, tampilkan notif
+                      $("#display").load(baseURL + '/rawat_jalan/display?t=' + mlite.token);
+                      $('#notif').html("<div class=\"alert alert-success alert-dismissible fade in\" role=\"alert\" style=\"border-radius:0px;margin-top:-15px;\">" +
+                          "Status lanjut pasien telah disimpan!" +
+                          "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">&times;</button>" +
+                          "</div>").show();
+                  }
+                });
+              }
             }
         }
     });

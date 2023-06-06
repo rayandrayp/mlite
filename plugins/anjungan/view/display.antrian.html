@@ -1137,6 +1137,7 @@
                                             } else {
                                                 codebutton = '<td><button data-index-rujukan="' + (index - 1) + '" class="btn btn-primary"  type="button">Pilih</button></td>';
                                             }
+                                            if(item.ppkPelayanan == 'RS SOEPRAOEN') {
                                                 trHTML += '<tr>' +
                                                     '<th scope="row">' + index + '</th>' +
                                                     '<td>' + item.noKunjungan + '</td>' +
@@ -1146,7 +1147,7 @@
                                                     codebutton +
                                                     '</tr>';
                                                 dataRujukanUtama += '{"noRujukan":"' + item.noKunjungan + '" , "nik":"' + item.peserta.nik + '"},';
-                                            
+                                            }
                                         }
                                     });
                                     // dataRujukanUtama = dataRujukanUtama.substring(0, dataRujukanUtama.length - 1);
@@ -1177,15 +1178,17 @@
                                             } else {
                                                 codebutton = '<td><button data-index-rujukan="' + (index - 1) + '" class="btn btn-primary"  type="button">Pilih</button></td>';
                                             }
-                                            trHTML += '<tr>' +
-                                                '<th scope="row">' + index + '</th>' +
-                                                '<td>' + item.noKunjungan + '</td>' +
-                                                '<td>' + '-' + '</td>' +
-                                                '<td>' + item.tglKunjungan + '</td>' +
-                                                '<td>' + item.poliRujukan.nama + '</td>' +
-                                                codebutton +
-                                                '</tr>';
-                                            dataRujukanUtama += '{"noRujukan":"' + item.noKunjungan + '" , "nik":"' + item.peserta.nik + '"},';
+                                            if(item.ppkPelayanan == 'RS SOEPRAOEN') {
+                                                trHTML += '<tr>' +
+                                                    '<th scope="row">' + index + '</th>' +
+                                                    '<td>' + item.noKunjungan + '</td>' +
+                                                    '<td>' + '-' + '</td>' +
+                                                    '<td>' + item.tglKunjungan + '</td>' +
+                                                    '<td>' + item.poliRujukan.nama + '</td>' +
+                                                    codebutton +
+                                                    '</tr>';
+                                                dataRujukanUtama += '{"noRujukan":"' + item.noKunjungan + '" , "nik":"' + item.peserta.nik + '"},';
+                                            }
                                         }
                                     });
                                     dataRujukanUtama = dataRujukanUtama.substring(0, dataRujukanUtama.length - 1);

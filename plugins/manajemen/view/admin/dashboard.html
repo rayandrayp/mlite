@@ -268,10 +268,10 @@
                             <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRJMonth >= 0}up{else}down{/if}"></i>
                             ({?= $stats.percentRevenueRJMonth ?}%)
                         </span>
-                        Piutang : 0
+                        Piutang : {?= $stats.getPiutangRJMonth ?}
                         <span class="stat-up-down">
                             <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRJMonth >= 0}up{else}down{/if}"></i>
-                            <!-- ({?= $stats.percentRevenueRJMonth ?}%) -->
+                            ({?= $stats.percentPiutangRJMonth ?}%)
                         </span>
                     </div>
               </div>
@@ -290,10 +290,10 @@
                             <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRIMonth >= 0}up{else}down{/if}"></i>
                             ({?= $stats.percentRevenueRIMonth ?}%)
                         </span>
-                        Piutang : 0
+                        Piutang : {?= $stats.getPiutangRIMonth ?}
                         <span class="stat-up-down">
                             <i class="fa fa-arrow-circle-{if: $stats.percentRevenueRIMonth >= 0}up{else}down{/if}"></i>
-                            <!-- ({?= $stats.percentRevenueRIMonth ?}%) -->
+                            ({?= $stats.percentPiutangRIMonth ?}%)
                         </span>
                     </div>
               </div>

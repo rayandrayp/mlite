@@ -2709,7 +2709,16 @@ class Site extends SiteModule
           //     'loket' => 'Obat'
           //   ]);
           //redirect(url('anjungan/pasien'));
-          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kdbooking, 6);
+        $dataTambahAntreanFarmasi = $this->tambaAntreanFarmasiBPJS($kdbooking,'Non racikan', $_GET['noantrian']);
+        $response = $this->sendDataWSBPJS('antrean/farmasi/add', $dataTambahAntreanFarmasi);
+        if ($response['metadata']['code'] != '200') {
+          $this->db('mlite_settings')->save([
+            'module' => 'debug',
+            'field' => 'farmasi tambah antrean',
+            'value' => $kdbooking . '|' . $response['metadata']['code'] . '|' . $response['metadata']['message']
+          ]);
+        }
+          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kdbooking, 6, 'Non racikan');
           $response = $this->sendDataWSBPJS('antrean/updatewaktu', $dataUpdateWaktuAntrean);
           if ($response['metadata']['code'] != '200') {
             $this->db('mlite_settings')->save([
@@ -2806,7 +2815,17 @@ class Site extends SiteModule
           //     'end_time' => '00:00:00',
           //     'loket' => 'Racikan'
           //   ]);
-          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kdbooking, 6);
+        $dataTambahAntreanFarmasi = $this->tambaAntreanFarmasiBPJS($kdbooking,'Racikan', $_GET['noantrian']);
+        $response = $this->sendDataWSBPJS('antrean/farmasi/add', $dataTambahAntreanFarmasi);
+        if ($response['metadata']['code'] != '200') {
+          $this->db('mlite_settings')->save([
+            'module' => 'debug',
+            'field' => 'farmasi tambah antrean',
+            'value' => $kdbooking . '|' . $response['metadata']['code'] . '|' . $response['metadata']['message']
+          ]);
+        }
+
+          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kdbooking, 6,'Racikan');
           $response = $this->sendDataWSBPJS('antrean/updatewaktu', $dataUpdateWaktuAntrean);
           if ($response['metadata']['code'] != '200') {
             $this->db('mlite_settings')->save([
@@ -4672,7 +4691,24 @@ class Site extends SiteModule
       return $request;
     }
   
-    public function updateWaktuAntreanBPJS($kodebooking, $taskid)
+    public function tambaAntreanFarmasiBPJS($kodebooking, $jenisObat, $nomorantrean)
+    {
+    //   {
+    //     "kodebooking": "16032021A001",
+    //     "jenisresep": "racikan" ---> (racikan / non racikan),
+    //     "nomorantrean": 1,
+    //     "keterangan": ""
+    // }
+      $request = array(
+        "kodebooking" => $kodebooking,
+        "jenisresep" => $jenisObat,
+        "nomorantrean" => $nomorantrean,
+        "keterangan" => ""
+      );
+      return $request;
+    }
+  
+    public function updateWaktuAntreanBPJS($kodebooking, $taskid, $jenisObat = null)
     {
       $waktu = strtotime(date("Y-m-d H:i:s")) * 1000;
       //   "taskid": {
@@ -4685,11 +4721,20 @@ class Site extends SiteModule
       //     7 (akhir waktu obat selesai dibuat),
       //     99 (tidak hadir/batal)
       // },
-      $request = array(
-        "kodebooking" => $kodebooking,
-        "taskid" => $taskid,
-        "waktu" => $waktu
-      );
+      if(!empty($jenisObat)){
+        $request = array(
+          "kodebooking" => $kodebooking,
+          "taskid" => $taskid,
+          "waktu" => $waktu,
+          "jenisresep" => $jenisObat
+        );
+      }else{
+        $request = array(
+          "kodebooking" => $kodebooking,
+          "taskid" => $taskid,
+          "waktu" => $waktu
+        );
+      }
       // $request = '{
       //                 "kodebooking": "' . $kodebooking . '",
       //                 "taskid": ' . $taskid . ',

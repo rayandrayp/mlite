@@ -88,6 +88,10 @@ class Admin extends AdminModule
         $revenueBulanLalu = $this->getRevenueRIRJ(date('Y-m', strtotime('-1 month')));
         $revenueAllBulanIni = $revenueBulanIni['Ralan'] + $revenueBulanIni['Ranap'];
         $revenueAllBulanLalu = $revenueBulanLalu['Ralan'] + $revenueBulanLalu['Ranap'];
+        $piutangBulanIni = $this->getPiutangRIRJ(date('Y-m'));;
+        $piutangBulanLalu = $this->getPiutangRIRJ(date('Y-m', strtotime('-1 month')));;
+
+
         $stats['getTotalRevenueMonth'] = number_format($revenueAllBulanIni, 0, '', '.');
         $stats['percentRevenueMonth'] = 0;
         if ($stats['getTotalRevenueMonth'] != 0) {
@@ -102,6 +106,16 @@ class Admin extends AdminModule
         $stats['percentRevenueRIMonth'] = 0;
         if ($stats['getRevenueRIMonth'] != 0) {
             $stats['percentRevenueRIMonth'] = number_format((($revenueBulanIni['Ranap'] - $revenueBulanLalu['Ranap'])  / $revenueBulanIni['Ranap']) * 100, 0, '', '.');
+        }
+        $stats['getPiutangRJMonth'] = number_format($piutangBulanIni['Ralan'], 0, '', '.');
+        $stats['percentPiutangRJMonth'] = 0;
+        if ($stats['getPiutangRJMonth'] != 0) {
+            $stats['percentPiutangRJMonth'] = number_format((($piutangBulanIni['Ralan'] - $piutangBulanLalu['Ralan']) / $piutangBulanIni['Ralan']) * 100, 0, '', '.');
+        }
+        $stats['getPiutangRIMonth'] = number_format($piutangBulanIni['Ranap'], 0, '', '.');
+        $stats['percentPiutangRIMonth'] = 0;
+        if ($stats['getPiutangRIMonth'] != 0) {
+            $stats['percentPiutangRIMonth'] = number_format((($piutangBulanIni['Ranap'] - $piutangBulanLalu['Ranap'])  / $piutangBulanIni['Ranap']) * 100, 0, '', '.');
         }
 
         $day = array(
@@ -1429,6 +1443,17 @@ class Admin extends AdminModule
             SUM(CASE WHEN  r.status_lanjut = 'Ralan' THEN b.totalbiaya ELSE 0 END) Ralan,
             SUM(CASE WHEN  r.status_lanjut = 'Ranap' THEN b.totalbiaya ELSE 0 END) Ranap
             FROM billing b INNER JOIN reg_periksa r ON r.no_rawat = b.no_rawat  where b.tgl_byr LIKE '$date%'");
+        $query->execute();
+        $data = $query->fetchAll(\PDO::FETCH_ASSOC);
+        return $data[0];
+    }
+
+    public function getPiutangRIRJ($date)
+    {
+        $query = $this->db()->pdo()->prepare("SELECT 
+            SUM(CASE WHEN  r.status_lanjut = 'Ralan' THEN b.sisapiutang ELSE 0 END) Ralan,
+            SUM(CASE WHEN  r.status_lanjut = 'Ranap' THEN b.sisapiutang ELSE 0 END) Ranap
+            FROM piutang_pasien b INNER JOIN reg_periksa r ON r.no_rawat = b.no_rawat  where b.tgl_piutang LIKE '$date%' AND b.`status` = 'Belum Lunas'");
         $query->execute();
         $data = $query->fetchAll(\PDO::FETCH_ASSOC);
         return $data[0];

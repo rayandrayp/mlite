@@ -824,12 +824,13 @@ class Admin extends AdminModule
         ]);
       }
       //cek jika sudah ada record
-      if (empty($this->core->mysql('temporary2')->where('temp2', $_POST['no_rawat'])->oneArray())) {
+      if (empty($this->core->mysql('record_waktulayan_bpjs')->where('no_rawat', $_POST['no_rawat'])->oneArray())) {
         // echo $_POST['no_rawat'] . ' tidak ada ' . $time;
         $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->save($_POST);
 
         //add waktu pasien saat mulai layan
-        $this->core->mysql()->pdo()->exec("INSERT INTO `temporary2` (temp1, temp2, temp3, temp4) VALUES ('waktupasien', '" . $_POST['no_rawat'] . "','$time','-')");
+        // $this->core->mysql()->pdo()->exec("INSERT INTO `temporary2` (temp1, temp2, temp3, temp4) VALUES ('waktupasien', '" . $_POST['no_rawat'] . "','$time','-')");
+        $this->core->mysql()->pdo()->exec("INSERT INTO `record_waktulayan_bpjs` (no_rawat, tgl_perawatan, taskid4) VALUES ('" . $_POST['no_rawat'] . "','".date('Y-m-d')."','$time')");
         // $this->db('temporary2')->save([
         //   'temp1' => 'waktupasien',
         //   'temp2' => $_POST['no_rawat'],
@@ -850,23 +851,36 @@ class Admin extends AdminModule
           ]);
         }
       }
+      
+      //trigger send whatsapp
+      $pasien = $this->db('pasien')->where('no_rkm_medis', $this->db('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->oneArray()['no_rkm_medis'])->oneArray();
+      // get pasien no_telp
+      $no_telp = $pasien['no_tlp'];
+      // $data['whatsapp'] = $no_telp;
+      // get pasien nama
+      $nama = $pasien['nm_pasien'];
+      $data['whatsapp'] = $this->postWhatsapp($no_telp, $nama);
+
+
       $data['status'] = 'success';
       $data['message'] = 'Status pasien berhasil diubah.';
       echo json_encode($data);
+
     } else if ($_POST['stts'] == 'Sudah') { //pasien sudah selesai dilayani
 
       //cek jika sudah ada record
-      if (empty($this->core->mysql('temporary2')->where('temp2', $_POST['no_rawat'])->oneArray())) {
+      if (empty($this->core->mysql('record_waktulayan_bpjs')->where('temp2', $_POST['no_rawat'])->oneArray())) {
         $data['status'] = 'error';
         $data['message'] = 'Status pasien tidak runut, silahkan update "Berkas Diterima" terlebih dahulu.';
         echo json_encode($data);
       } else {
         $this->core->mysql('reg_periksa')->where('no_rawat', $_POST['no_rawat'])->save($_POST);
         //update waktu pasien saat selesai layan
-        $this->core->mysql('temporary2')->where('temp1', 'waktupasien')->where('temp2', $_POST['no_rawat'])->update('temp4', $time);
+        $this->core->mysql('record_waktulayan_bpjs')->where('no_rawat', $_POST['no_rawat'])->update('taskid5', $time);
+        // $this->core->mysql('temporary2')->where('temp1', 'waktupasien')->where('temp2', $_POST['no_rawat'])->update('temp4', $time);
         if ($kodebooking != '') {
           //send data Update waktu antrean = 5
-          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kodebooking, 5);
+          $dataUpdateWaktuAntrean = $this->updateWaktuAntreanBPJS($kodebooking, 5, $_POST['jenisObat']);
           $response = $this->sendDataWSBPJS('antrean/updatewaktu', $dataUpdateWaktuAntrean);
           if ($response['metadata']['code'] != '200') {
             $this->core->mysql('mlite_settings')->save([
@@ -1799,6 +1813,64 @@ class Admin extends AdminModule
     }
     return $data;
   }
+
+  function postWhatsapp($nomor_hp,$nama){
+    //The url you wish to send the POST request to
+    $url = "http://192.168.9.18:9000/humas/messages/send";
+    // return $url;
+
+    if($nomor_hp == '' || $nomor_hp == null || $nomor_hp == '-'){
+      return false;
+    }
+
+    // check if $nomor_hp start with 0, if yes, replace with 62
+    if (substr($nomor_hp, 0, 1) == '0') {
+      $nomor_hp = '62'.substr($nomor_hp, 1);
+    }
+    
+
+    //The data you want to send via POST
+    $requested_data = [
+        'jid'     => $nomor_hp."@s.whatsapp.net",
+        'type'    => 'number',
+        'message' => [
+          'text' => 
+          'SELAMAT DATANG DI RST dr.SOEPRAOEN
+Yth.'.$nama.'
+Terima kasih atas kepercayaan Anda kepada Rumah Sakit Tk.II dr.Soepraoen untuk memberikan pelayanan kesehatan bagi Anda dan keluarga.
+Jika Bapak/Ibu membutuhkan bantuan , Silahkan menghubungi Customer Care RST dr.Soepraoen di:
+          Telp : 0341-325111/325112
+          WhatsApp  : 0811-3229-9222
+Demi peningkatan mutu pelayanan, kami mohon kesediaan Anda untuk memberikan penilaian dan masukan melalui link di bawah ini.
+          
+https://forms.gle/NkRGZ8Me4EMQ2Nb79
+          
+Terima kasih'
+        ],
+    ];
+
+    $jsonData = json_encode($requested_data);
+
+    $header = array(
+      'Accept: application/json',
+      // form type
+      'Content-Type: application/json',
+    );
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+
+    $res = curl_exec($ch);
+    
+    $data['response'] = json_decode($res, true);
+    $data['requested_data'] = $jsonData;
+    curl_close($ch);
+
+    return $data;
+  }
+
 
   //begin function decrypt
   function Decrypt($key, $string)
